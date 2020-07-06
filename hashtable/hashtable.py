@@ -55,11 +55,12 @@ class HashTable:
 
         Implement this, and/or DJB2.
         """
-        myhash = 2166136261
+        myhash = 14695981039346656037 #fnv 64bit offset
         mychars=key.encode()
         for i in mychars:
-            myhash = myhash * 16777619 #fnv prime
+            myhash = myhash * 1099511628211 #fnv 64 bit prime
             myhash = myhash ^ i
+        return myhash
 
 
     def djb2(self, key):
@@ -76,8 +77,8 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        return self.fnv1(key) % self.capacity
+        # return self.djb2(key) % self.capacity
 
     def put(self, key, value):
         """
@@ -87,7 +88,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        index = self.hash_index(key)
+        self.table[index]=value
 
 
     def delete(self, key):
@@ -98,7 +100,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        index = self.hash_index(key)
+        self.table[index]=None
 
 
     def get(self, key):
@@ -109,7 +112,8 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        index = self.hash_index(key)
+        return self.table[index]
 
 
     def resize(self, new_capacity):
