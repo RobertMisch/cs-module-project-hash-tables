@@ -7,7 +7,54 @@ class HashTableEntry:
         self.value = value
         self.next = None
 
+class HashLinkedList:
+    def __init__(self):
+        self.head=None
+    
+    def find(self, key):
+        cur = self.head
+        while cur is not None:
+            if cur.key == key:
+                return cur
+            cur = cur.next
+        return None  # we didn't find it
 
+    def insert_at_head(self, key, value):
+        n = HashTableEntry(key, value)
+        if self.head == None:
+            self.head=n
+        n.next = self.head
+        self.head = n
+    def delete(self, key):
+        cur = self.head
+
+        # Special case of deleting the head
+
+        if cur.key == key:  # Are we deleting the head?
+            self.head = self.head.next
+            cur.next = None
+            return cur
+
+        # General case
+
+        prev = cur
+        cur = cur.next
+
+        while cur is not None:
+            if cur.key == key:
+                prev.next = cur.next  # cuts out the node
+                cur.next = None
+                return cur
+            else:
+                prev = prev.next
+                cur = cur.next
+
+        return None
+
+
+    def append(self, value):
+        # TODO
+        pass
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
 
@@ -22,6 +69,9 @@ class HashTable:
 
     def __init__(self, capacity):
         self.capacity= capacity
+        if(self.capacity< MIN_CAPACITY):
+            self.capacity= MIN_CAPACITY
+
         self.num_stored=0
         self.table= [None] * self.capacity
 
@@ -89,7 +139,17 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        self.table[index]=value
+        bucket = self.table[index]
+        if ( bucket != None):
+            if(bucket.find(key) == None):
+                bucket.insert_at_head(key, value)
+            else:
+                bucket.find(key).value=value 
+        else:
+            bucket=HashLinkedList
+            bucket.insert_at_head(bucket, key, value)
+            self.num_stored+=1
+
 
 
     def delete(self, key):
@@ -101,7 +161,11 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        self.table[index]=None
+        temp = self.table[index].delete(key)
+        if temp == None:
+            print('warning: key not found')
+            return
+        return temp
 
 
     def get(self, key):
@@ -113,7 +177,11 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        return self.table[index]
+        temp = self.table[index].find(key)
+        if temp == None:
+            print('warning: key not found')
+        else:
+            return temp.value 
 
 
     def resize(self, new_capacity):
