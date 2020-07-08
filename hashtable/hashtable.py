@@ -9,7 +9,7 @@ class HashTableEntry:
 
 class HashLinkedList:
     def __init__(self):
-        self.head=None
+        self.head = None
     
     def find(self, key):
         cur = self.head
@@ -23,14 +23,17 @@ class HashLinkedList:
         n = HashTableEntry(key, value)
         if self.head == None:
             self.head=n
+            return 
         n.next = self.head
         self.head = n
+
     def delete(self, key):
         cur = self.head
 
         # Special case of deleting the head
 
         if cur.key == key:  # Are we deleting the head?
+            self.print()
             self.head = self.head.next
             cur.next = None
             return cur
@@ -55,6 +58,20 @@ class HashLinkedList:
     def append(self, value):
         # TODO
         pass
+    
+    def print(self):
+        cur=self.head
+        while cur != None:
+            print(cur.value)
+            cur=cur.next 
+        return
+    def all_values(self):
+        cur=self.head
+        result=[]
+        while cur != None:
+            result.append([cur.key, cur.value])
+            cur=cur.next 
+        return result
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
 
@@ -74,6 +91,9 @@ class HashTable:
 
         self.num_stored=0
         self.table= [None] * self.capacity
+
+    def __str__(self):
+        return f"{self.table}"
 
 
     def get_num_slots(self):
@@ -139,17 +159,20 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        bucket = self.table[index]
-        if ( bucket != None):
-            if(bucket.find(key) == None):
-                bucket.insert_at_head(key, value)
-            else:
-                bucket.find(key).value=value 
-        else:
-            bucket=HashLinkedList
-            bucket.insert_at_head(bucket, key, value)
+        if self.table[index] == None:
+            self.table[index]=HashLinkedList()
+            self.table[index].insert_at_head(key, value)
             self.num_stored+=1
-
+            if(self.get_load_factor()>=0.7):
+                self.resize(self.capacity*2)
+            # self.table[index].print()
+        else:
+            exists = self.table[index].find(key)
+            if(exists != None):
+                exists.value=value
+            else:
+                self.table[index].insert_at_head(key, value)
+                self.num_stored+=1
 
 
     def delete(self, key):
@@ -161,11 +184,18 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        temp = self.table[index].delete(key)
-        if temp == None:
+        # temp = self.table[index]
+        if self.table[index] == None:
             print('warning: key not found')
-            return
-        return temp
+            return None
+        else:
+            exists = self.table[index].find(key)
+            if(exists != None):
+                self.table[index].delete(key)
+            else:
+                print('warning: key not found')
+                return None
+
 
 
     def get(self, key):
@@ -177,11 +207,17 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        temp = self.table[index].find(key)
+        temp = self.table[index]
         if temp == None:
-            print('warning: key not found')
+            print('warning: key(index) not found')
+            print(self)
         else:
-            return temp.value 
+            node = temp.find(key)
+            if node == None:
+                print('warning: key(node) not found')
+            else:
+                return node.value
+
 
 
     def resize(self, new_capacity):
@@ -191,7 +227,23 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        #double capacity
+        # self.capacity= self.capacity * 2
+        self.capacity = new_capacity
+        #loop self.table
+        prev_table=self.table.copy()
+        self.table= [None] * self.capacity
+        for bucket in prev_table:
+        #for each bucket go through it's linked list
+            if bucket == None:
+                continue
+            cur=bucket.head
+            while cur != None:
+                self.put(cur.key, cur.value)
+                cur=cur.next 
+        #make the new table with all none's #self.table= [None] * self.capacity
+        #rehash the big array of stored stuff
+        
 
 
 
