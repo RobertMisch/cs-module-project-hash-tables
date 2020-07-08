@@ -18,11 +18,12 @@ def slowfun(x, y):
     Rewrite slowfun_too_slow() in here so that the program produces the same
     output, but completes quickly instead of taking ages to run.
     """
-    n = math.pow(x, y)
+    # n = math.pow(x, y)
     
-    if n not in cache:
-        cache[n]= (math.factorial(n)//(x+y))%982451653
-    return cache[n]
+    if (x,y) not in cache:
+        cache[(x,y)]= (math.factorial(math.pow(x, y))//(x+y))%982451653
+    return cache[(x,y)]
+    # f"{x},{y}" another possible n
     
 
 

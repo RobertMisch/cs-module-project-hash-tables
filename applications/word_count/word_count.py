@@ -1,5 +1,7 @@
 def word_count(s):
-    # Your code here
+    ignore = '":;,.-+=/\|[]{ }()*^&'
+    s.translate(None, ignore)
+    return s
 
 
 
