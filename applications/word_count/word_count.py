@@ -1,7 +1,17 @@
 def word_count(s):
-    ignore = '":;,.-+=/\|[]{ }()*^&'
-    s.translate(None, ignore)
-    return s
+    count={}
+    ignore = ['"', ':', ';', ',', '.', '-', '+', '=', '/', "\\", '|', '[', ']', '{', '}','(',')','*','^','&']
+    for i in ignore:
+        s=s.replace(i,'')
+    
+    s = s.lower().split()
+    for word in s:
+        if word in count:
+            count[word]+=1
+        else:
+            count[word]=1
+
+    return count
 
 
 
